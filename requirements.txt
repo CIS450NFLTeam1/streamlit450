@@ -1,8 +1,0 @@
-
-numpy @ file:///C:/ci/numpy_and_numpy_base_1618497418457/work
-pandas @ file:///C:/ci/pandas_1635488579061/work
-st-btn-select==0.1.2
-streamlit==1.2.0
-plotly @ file:///opt/conda/conda-bld/plotly_1646671701182/work
-
-
