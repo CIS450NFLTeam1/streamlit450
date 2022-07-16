@@ -47,6 +47,7 @@ def home():
     st.text('Matthew Bierman, Ben Reeder, Kyle Kriho, Chris Homren, and Ricardo Dinatale') 
     st.image('nfl.jpg')
     st.markdown("https://app.powerbi.com/groups/me/reports/7777a2cc-c206-4299-86de-531705b8a581/ReportSection",unsafe_allow_html= True)
+    st.text('New')
 
 
 def general():
