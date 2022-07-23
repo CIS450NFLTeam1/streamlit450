@@ -1,20 +1,20 @@
-
-from pickle import TRUE
 import streamlit as st
 import pandas as pd
-import plotly.express as px
-import numpy as np
-st.set_page_config(layout="wide")
+import streamlit.components.v1 as components
+from PIL import Image
+im = Image.open('ASU.jpg')
+st.set_page_config(page_title='CIS 450 NFL Group 1', page_icon=im, layout="wide", initial_sidebar_state="expanded")
 
 
 st.title('CIS 450 NFL Data Exploration')
 st.text('This dataset contains NFL game data from 1965-2019')
 
 st.sidebar.title('Nagivation')
-options = st.sidebar.radio('Pages',options = ['Introduction','Data Overview','General Stats','Win/Loss Stats','Win vs. Loss','Offensive/Defensive Leaders','Game Prediction (Draft)'])
+options = st.sidebar.radio('Pages',options = ['Introduction','Data Overview','EDA Dashboards','Win/Loss Dashboards','Game Prediction (Draft)'])
 
 
 df = pd.read_csv('streamlit_file.csv')
+df2 = pd.read_csv('NFLData3 Rolling Averages.csv')
 df_group = pd.read_csv('group_by2.CSV')
 df_analysis = df.copy()
 df_analysis.drop(['game_time_eastern','game_time_local'],inplace = True,axis = 1)
@@ -36,93 +36,85 @@ win_loss_mean = df.groupby('win_loss_num').agg('mean')[['points_for', 'points_ag
 
 def home():
     
-    st.subheader('This is a web app for CIS 450, NFL Data Group 1')
+    st.subheader('This is a web app for CIS 450 NFL Data Group 1')
     st.subheader('In this application, we will showcase a number of features surrounding our data') 
     st.markdown('* A general overview of the dataset we will be utilizing to perform our analysis')
     st.markdown('* A summation of general statistics, offensive statistics, and defensive statistics')
     st.markdown('* A machine learning model that can predict the outcome of a game better than the flip of a coin')
     st.text('')
-    st.text('(Navigate to other pages by clicking arrow in top left)')
     st.subheader('Group Members:')
     st.text('Matthew Bierman, Ben Reeder, Kyle Kriho, Chris Homren, and Ricardo Dinatale') 
     st.image('nfl.jpg')
-    st.markdown("https://app.powerbi.com/groups/me/reports/7777a2cc-c206-4299-86de-531705b8a581/ReportSection",unsafe_allow_html= True)
-    st.text('New')
+    
 
-
-def general():
-    st.header('General Statistics')
-    st.subheader('Number of games started at each hour (EST)')
-    fig4 = px.bar(df['game_hour'].value_counts(),df['game_hour'].value_counts().index,df['game_hour'].value_counts().values)
-    st.plotly_chart(fig4)
-    st.subheader("Number of games that started in each 'Time Slot'")
-    st.markdown('* First Slot - 10-2 EST')
-    st.markdown('* Second Slot - 3-5 EST') 
-    st.markdown('* Third Slot - 6-9 EST')
-    fig5 = px.bar(df['time_of_day'].value_counts(),df['time_of_day'].value_counts().index,df['time_of_day'].value_counts().values)
-    st.plotly_chart(fig5)
-    st.subheader('Count of games by the day of the week that they were played on')
-    fig6 = px.bar(df['Day'].value_counts(),df['Day'].value_counts().index,df['Day'].value_counts().values)
-    st.plotly_chart(fig6)
-    st.subheader('Count of whether games ended in OT or Regulation')
-    fig6 = px.bar(df['OT'].value_counts(),df['OT'].value_counts().index,df['OT'].value_counts().values)
-    st.plotly_chart(fig6)
+# def general():
+#     st.header('General Statistics')
+#     st.subheader('Number of games started at each hour (EST)')
+#     fig4 = px.bar(df['game_hour'].value_counts(),df['game_hour'].value_counts().index,df['game_hour'].value_counts().values).update_layout(xaxis_title="Game Hour", yaxis_title="Count")
+#     st.plotly_chart(fig4)
+#     st.subheader("Number of games that started in each 'Time Slot'")
+#     st.markdown('* First Slot - 10-2 EST')
+#     st.markdown('* Second Slot - 3-5 EST') 
+#     st.markdown('* Third Slot - 6-9 EST')
+#     fig5 = px.bar(df['time_of_day'].value_counts(),df['time_of_day'].value_counts().index,df['time_of_day'].value_counts().values).update_layout(xaxis_title="Time Slot", yaxis_title="Count")
+#     st.plotly_chart(fig5)
+#     st.subheader('Count of games by the day of the week that they were played on')
+#     fig6 = px.bar(df['Day'].value_counts(),df['Day'].value_counts().index,df['Day'].value_counts().values).update_layout(xaxis_title="Day of Week", yaxis_title="Count")
+#     st.plotly_chart(fig6)
+#     st.subheader('Count of whether games ended in OT or Regulation')
+#     fig6 = px.bar(df['OT'].value_counts(),df['OT'].value_counts().index,df['OT'].value_counts().values).update_layout(xaxis_title="OT/Regulation", yaxis_title="Count")
+#     st.plotly_chart(fig6)
 
 
 def stats():
     st.header('Data Statistics/Header')
     st.subheader('General Data Statistics:')
-    st.write(df_analysis.describe())
+    st.write(df2.describe())
     st.subheader('Head of Data:')
-    st.write(df_analysis.head())
+    st.write(df2.head())
+    
 
 
 def init_plots():
-    st.header('Win/Loss Visualizations')
-    if st.checkbox('Show dataframe'):
-        st.text('Sort by clicking on column header')
-        st.dataframe(df_group)
-    st.header('Total Wins')
-    fig = px.bar(df_group, x=df_group.sort_values('wins',ascending = False)['team'], y=df_group.sort_values('wins',ascending = False)['wins'].values,color = df_group.sort_values('wins',ascending = False)['wins'].values )
-    st.plotly_chart(fig)
-    st.header('Total Games Played')
-    fig8 = px.bar(df_group, x=df_group.sort_values('total_games',ascending = False)['team'], y=df_group.sort_values('total_games',ascending = False)['total_games'].values,color = df_group.sort_values('total_games',ascending = False)['total_games'].values )
-    st.plotly_chart(fig8)
-    st.header('Win Percentage')
-    fig9 = px.bar(df_group, x=df_group.sort_values('win_pct',ascending = False)['team'], y=df_group.sort_values('win_pct',ascending = False)['win_pct'].values,color = df_group.sort_values('win_pct',ascending = False)['win_pct'].values )
-    st.plotly_chart(fig9)
+    st.title('EDA Dashboards')
+    st.success('Click in bottom right-hand corner of dashboard to view dashboard in full-screen mode')
+    st.info("Click X on Navigation pane in order for dashboard to correctly render")
+    html_temp = """
+    <div class='tableauPlaceholder' id='viz1658530648281' style='position: relative'><noscript><a href='#'><img alt=' ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;NF&#47;NFLViz_16584358482730&#47;PassingDashboard&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='NFLViz_16584358482730&#47;PassingDashboard' /><param name='tabs' value='yes' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;NF&#47;NFLViz_16584358482730&#47;PassingDashboard&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1658530648281');                    var vizElement = divElement.getElementsByTagName('object')[0];                    if ( divElement.offsetWidth > 800 ) { vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';} else if ( divElement.offsetWidth > 500 ) { vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';} else { vizElement.style.width='100%';vizElement.style.height='1050px';}                     var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+    """
+    components.html(html_temp, width=1400, height=1100)
+    max_width_str = f"max-width: 1650px;"
+    st.markdown(f"""<style>.reportview-container .main .block-container{{{max_width_str}}}</style>""",unsafe_allow_html=True)
 
 
-
-
-def offensive_plot():
-    st.header('Offensive Visualizations')
-    st.subheader('These visualizations show the Top 10 teams in average offensive output by the field selected')
-    sort_option_o = st.selectbox('Select field to Show Graph for',options = ['completions', 'pass_attempts', 'completion_pct', 'passing_yards',
-       'passing_tD', 'Int', 'sacks', 'sack_yards', 'qb_rating',
-       'rush_attempts', 'rush_yards', 'rush_yards_per_attempt', 'rush_td',
-       'total_yards', 'o_num_plays', 'o_yards_per_play', 'turnovers_lost'])
-    if st.checkbox('Show Table'):
-        st.table(full_groupby.sort_values(sort_option_o,ascending = False)[:10][sort_option_o])
-    fig2 = px.bar(full_groupby, x=full_groupby.sort_values(sort_option_o,ascending = False)[:10].index, y=full_groupby.sort_values(sort_option_o,ascending = False)[:10][sort_option_o].values,color = full_groupby.sort_values(sort_option_o,ascending = False)[:10][sort_option_o].values )
-    st.plotly_chart(fig2)
-    st.header('Defensive Visualizations')
-    st.subheader('These visualizations show Teams by average defensive output by the field selected')
-    st.header('Defensive Number of Plays')
-    if st.checkbox('Show  Defensive Number of Plays Table'):
-        st.text('Sort by clicking on column header')
-        st.dataframe(full_groupby['d_num_plays'])
-    fig3 = px.bar(full_groupby, x=full_groupby.sort_values('d_num_plays',ascending = False).index, y=full_groupby.sort_values('d_num_plays',ascending = False)['d_num_plays'].values,color = full_groupby.sort_values('d_num_plays',ascending = False)['d_num_plays'].values )
-    st.plotly_chart(fig3)
-    st.header('Defensive Yards per Play')
-    if st.checkbox('Show  Defensive Yards per Play Table'):
-        st.text('Sort by clicking on column header')
-        st.dataframe(full_groupby['d_yards_per_play'])
-    fig3 = px.bar(full_groupby, x=full_groupby.sort_values('d_yards_per_play',ascending = False).index, y=full_groupby.sort_values('d_yards_per_play',ascending = False)['d_yards_per_play'].values,color = full_groupby.sort_values('d_yards_per_play',ascending = False)['d_yards_per_play'].values )
-    st.plotly_chart(fig3)
-    st.header('From this data we can gather that:')
-    st.markdown('* There is not much variation in the defensive stats that we have at hand')
-    st.markdown('* These defensive statistics may not be of much use when predicting W/L')
+# def offensive_plot():
+#     st.header('Offensive Visualizations')
+#     st.subheader('These visualizations show the Top 10 teams in average offensive output by the field selected')
+#     sort_option_o = st.selectbox('Select field to Show Graph for',options = ['completions', 'pass_attempts', 'completion_pct', 'passing_yards',
+#        'passing_tD', 'Int', 'sacks', 'sack_yards', 'qb_rating',
+#        'rush_attempts', 'rush_yards', 'rush_yards_per_attempt', 'rush_td',
+#        'total_yards', 'o_num_plays', 'o_yards_per_play', 'turnovers_lost'])
+#     if st.checkbox('Show Table'):
+#         st.table(full_groupby.sort_values(sort_option_o,ascending = False)[:10][sort_option_o])
+#     fig2 = px.bar(full_groupby, x=full_groupby.sort_values(sort_option_o,ascending = False)[:10].index, y=full_groupby.sort_values(sort_option_o,ascending = False)[:10][sort_option_o].values,color = full_groupby.sort_values(sort_option_o,ascending = False)[:10][sort_option_o].values )
+#     st.plotly_chart(fig2)
+#     st.header('Defensive Visualizations')
+#     st.subheader('These visualizations show Teams by average defensive output by the field selected')
+#     st.header('Defensive Number of Plays')
+#     if st.checkbox('Show  Defensive Number of Plays Table'):
+#         st.text('Sort by clicking on column header')
+#         st.dataframe(full_groupby['d_num_plays'])
+#     fig3 = px.bar(full_groupby, x=full_groupby.sort_values('d_num_plays',ascending = False).index, y=full_groupby.sort_values('d_num_plays',ascending = False)['d_num_plays'].values,color = full_groupby.sort_values('d_num_plays',ascending = False)['d_num_plays'].values )
+#     st.plotly_chart(fig3)
+#     st.header('Defensive Yards per Play')
+#     if st.checkbox('Show  Defensive Yards per Play Table'):
+#         st.text('Sort by clicking on column header')
+#         st.dataframe(full_groupby['d_yards_per_play'])
+#     fig3 = px.bar(full_groupby, x=full_groupby.sort_values('d_yards_per_play',ascending = False).index, y=full_groupby.sort_values('d_yards_per_play',ascending = False)['d_yards_per_play'].values,color = full_groupby.sort_values('d_yards_per_play',ascending = False)['d_yards_per_play'].values )
+#     st.plotly_chart(fig3)
+#     st.header('From this data we can gather that:')
+#     st.markdown('* There is not much variation in the defensive stats that we have at hand')
+#     st.markdown('* These defensive statistics may not be of much use when predicting W/L')
 
 
 
@@ -162,28 +154,20 @@ def ml():
 
 
 def wvsl():
-    win_v_loss = st.selectbox('Select a Statistical Field',win_loss_mean.columns)
-    col1,col2 = st.columns(2)
-    col1.metric('Loss:',np.round(win_loss_mean.loc[0][win_v_loss],2))
-    col2.metric('Win:',np.round(win_loss_mean.loc[1][win_v_loss],2))
-    st.markdown("https://app.powerbi.com/groups/me/reports/a3f44c6e-e692-49b7-9b4e-912f074f1ebe/ReportSectionab3a9f1618ddae25a6c5",unsafe_allow_html= True)
-    
+   st.title('Win/Loss Dashboard in Progress')
 
 
 if options == 'Introduction':
     home()
 elif options == 'Data Overview':
     stats()
-elif options == 'Win/Loss Stats':
+elif options == 'EDA Dashboards':
     init_plots()
-elif options == 'Offensive/Defensive Leaders':
-    offensive_plot()
-elif options == 'General Stats':
-    general()
+elif options == 'Win/Loss Dashboards':
+    wvsl()
+
 elif options == 'Game Prediction (Draft)':
     ml()
-elif options == 'Win vs. Loss':
-    wvsl()
 
 
 
